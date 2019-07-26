@@ -1,0 +1,17 @@
+[MID]
+baseurl=http://subhost.example.com/isadore
+MIDpassword=PUT_IN_MID_PWD
+configpath=/resources/MID
+uploadpath=/resources/data/readings
+rcstatuspath=/resources/controls/
+hub_serial=/dev/ttyAMA0
+STORE_RAW_DATA_MODE=True
+RAW_DATA_LOC=PACKETS.data
+# RS485_PORT=/dev/ttyUSB0
+# RS485_PARITY=ODD
+RS485_TIMEOUT=5			#seconds to wait for response per device
+RS485_BAUD=9600
+enableRC_p=FALSE
+min_reading_interval_seconds=180
+log_level=WARNING
+turn_off=FALSE

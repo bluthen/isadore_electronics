@@ -1,0 +1,68 @@
+#define BAUD 9600
+
+#include <stdbool.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/wdt.h>
+#include "tachometer.h"
+
+#define DATA_SIZE 30
+
+
+static volatile uint16_t counter = 0;
+static volatile bool even = true;
+
+static volatile uint16_t data[DATA_SIZE];
+static volatile uint8_t idx = 0;
+static volatile bool index_wrap = false;
+
+ISR(PCINT2_vect) {
+	if(even) {
+		++counter;
+	}
+	even = !even;
+}
+
+ISR(TIMER1_COMPA_vect) {
+	data[idx]=counter;
+	++idx;
+	counter = 0;
+	if(idx == DATA_SIZE) {
+		idx=0;
+		index_wrap = true;
+	}
+}
+
+uint16_t tachometer_rpm(void)
+{
+	uint32_t sum = 0;
+	uint8_t data_size = DATA_SIZE;
+	uint16_t i = 0;
+	cli();
+		if(!index_wrap) {
+			data_size=idx;
+		}
+		for(i=0; i < data_size; i++) {
+			sum+=data[i];
+		}
+	sei();
+	return (uint16_t)((double)(sum)/(double)(data_size)*60.0 + 0.5);
+}
+
+void tachometer_ioinit(void)
+{
+	DDRD &=~_BV(PD2); // read on PC5 
+	PORTD |= _BV(PD2); //Enable internal pullup resistor 
+
+	TCCR1B |=(1<<WGM12); // Timer 1 CTC mode
+	TIMSK1 |= (1 << OCIE1A); // Enable CTC interrupt
+	OCR1A = 15624; // one second when using cpu/256
+
+	// For 4Mhz
+	TCCR1B |= (1 << CS12);  // clk/256
+	
+	PCICR |= (1 << PCIE2);    //Enables interrupt vector1 (interupts 16:23)
+	PCMSK2 |= (1 << PCINT18); //PD2 interrupt PCINT18
+	sei(); //enable interupts
+}
+

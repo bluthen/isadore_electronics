@@ -1,0 +1,8 @@
+csv with four points per row are:
+date,address_100,address_101,address_100,address_100
+
+csv with two points per row are:
+date,address_100,address_101
+
+
+See also process.py comments, and string at top of file.

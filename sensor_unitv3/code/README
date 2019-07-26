@@ -1,0 +1,25 @@
+Compile sensor unit with address and feature set
+
+Addresses:
+UNITADDR= # < 2^16
+
+
+UNITFEATURES bit fields 1=enabled 0=disabled
+1 bit -- temp-hum
+2 bit -- anemometer
+3 bit -- tachometer (not enabled, see tachometer code).
+4 bit -- bearing/winding thermocouple (not enabled, see tachometer code).
+5 bit -- Infineon KP pressure sensor
+6 bit -- Freescale MPX pressure sensor
+
+Note: If both KP and MPX are enabled, only KP is used.
+
+UNITFEATURES=1   -- Just temp-hum
+UNITFEATURES=2   -- Just anemometer
+UNITFEATURES=3   -- both temp-hum and anemometer
+UNITFEATURES=17  -- both temp-hum and KP pressure sensor
+UNITFEATURES=33  -- both temp-hum and MPX pressure sensor
+UNITFEATURE=19   -- temp-hum and KP pressure and annemometer
+
+Ex:
+UNITDEFS="-DUNITADDR=102 -DUNITFEATURES=17" make (makeopts)
