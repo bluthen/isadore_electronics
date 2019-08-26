@@ -132,3 +132,37 @@ Usage: midsim.py [OPTION]...
 ## Calibration
 The main goal of the pressure modules was to report differencial pressure. The pressure module can be calibrated and there is a script to help with that process. It takes a large amounts of samples and sets an offset to match the reference. This script can be found at `sensor_hubv3/code/test/calibrator.py`
 
+
+## Configure mid_software
+
+Copy the mid_software to the raspberry pi. Copy `MID.cfg.example` to `MID.cfg` but one directory down from the location of mid_software. Modify MID.cfg for your needs. The most importanted are `baseurl` and `MIDpassword`Below is a reference for what each key means:
+
+* `baseurl` The url to the base location of your running instance of [isadore_server](https://github.com/bluthen/isadore_server/).
+* `MIDname` If you have multiple mids, this needs to be set so it knows which config to fetch. If it doesn't exist, all configs are fetched.
+* `MIDpassword` The mid password that was set for your instance of isadore_server.
+* `configpath` relative url where it should get the systems unit configuration. shouldn't need changing.
+* `uploadpath` the relative url it should use to upload sensor data it gets. shouldn't need changing.
+* `rcstatuspath` the relative url it uses for controls. shouldn't need changing.
+* `hub_serial` the serial port to use to communicate with the hub electronics board. `/dev/ttyAMA0` on old raspberry pi's, `/dev/serial0` on new ones.
+* `STORE_RAW_DATA_MODE` shouldn't need changing
+* `RAW_DATA_LOC` shouldn't need changing
+* `RS485_TIMEOUT` time out per unit. shouldn't need changing
+* `RS485_BAUD` The serial baud rate to use. shouldn't need changing
+* `enableRC_p` shouldn't need changing
+* `mid_reading_interval_seconds` The minimal amount of time to pass before reading sensor data again.
+* `log_level` The level to log at, can be `ERROR`, `WARNING`, or `DEBUG`
+* `turn_off` If it should be not be activly getting readings and uploading them.
+
+There are also some other configurations for specific temperature controls. For now for those parameters, please see the code to find them.
+
+## Running mid_software
+
+Put the following in the crontab of the user that is going to run mid_software on the MID. Replace the path to where you copied mid_software.
+
+```
+*/15 * * * * /home/pi/mid_software/processCheck.sh
+*/10 * * * * /home/pi/mid_software/mid_log_check.sh
+```
+
+* `processCheck.sh` will start the process if it doesn't find it running.
+* `mid_log_check.sh` tries to detect if the process locked up and will restart it, if it thinks it has.

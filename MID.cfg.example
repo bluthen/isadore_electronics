@@ -1,5 +1,6 @@
 [MID]
 baseurl=http://subhost.example.com/isadore
+#MIDname=hello
 MIDpassword=PUT_IN_MID_PWD
 configpath=/resources/MID
 uploadpath=/resources/data/readings
