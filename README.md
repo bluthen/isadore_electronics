@@ -52,7 +52,7 @@ Usage: make.py [OPTIONS] ADDRESS
 
 So for example you might do with a unit, with the programmed placed and the unit powered.
 ```
-python2 make.py -c -p --with-pressurev4b=0 102
+python2 make.py -f -c -p --with-pressurev4b=0 102
 ```
 
 If successful It is now programmed to use the pressurev4 module that gives you pressure/temperature/rh, and responses when address `102` is queried.
@@ -65,3 +65,70 @@ To program the hub you would run with the programmer in place and powered:
 cd sensor_hubv3/code
 ./fuse_crystal_clock.sh && make program
 ```
+
+# MID (Master Interface Device)
+
+This is basically the combination of a small computer (raspberry pi) and the hub electronics board. The hub and raspberry pi communicate serially. The hub has voltage regulators to power the raspberry pi.
+
+## HUB<-> pi wiring
+
+![HUB Pi wiring diagram](https://github.com/bluthen/isadore_electronics/raw/master/pi_com_pwr.jpg)
+
+
+Notice for the power, Red is on TP1, and black is outside of usb connector.
+
+Communication headers on pins 4 and 5 from outside corner.
+
+## Install and configure raspbian
+
+After installing raspian you'll want to set to enable access to the serail port with `raspi-config` and [disable the use of console by uart](https://www.raspberrypi.org/documentation/configuration/uart.md).
+
+```
+$ raspi-config
+Interface Options->Serial->No->Yes
+```
+
+You'll also want to make sure the following are installed:
+
+```
+apt-get install python python-pip python-dev
+pip install flask pytz requests restkit pyserial pymodbus numpy termcolor netifaces netaddr
+```
+
+
+## Troubleshooting
+There is a script called `midsim.py` that can aid in troubleshooting. It allows you to query sensors from the command line. It is located at `sensor_hubv3/code/test/midsim.py` 
+
+Below is the usage:
+
+```
+Usage: midsim.py [OPTION]...
+  -h, --help            show this screen
+  -v, --verbose         output verbose debug output
+  -c, --continous=t,c   Keep pulling every t seconds, c many times c=0 for infinite
+                        default is to pull once.
+  -f, --format=format   The output format to use:
+                        default:   The default style output
+                        csv:       csv style output
+  -t, --type=TYPE       TYPE=(temphum|anemometer|tachometer|thermocouple|pressure|pressurewide|
+                              multipointreset|multipointc[1-4]|multipointaddrc[1-4]|ping|
+                              unitversion|hubversion) *Required
+  --get-cal             Get calibration value for type
+  --set-cal=CAL_VALUE   Set calibration value for type
+  -p, --port=PORT       PORT=#
+  -a, --address=ADDRESS ADDRESS=#,#,#,...
+  -u                    use udp instead of serial
+  -d, --device=PATH     serial device to use for version 3, default /dev/ttyAMA0
+  -o                    Use direct command code instead of general (aka version2)
+  -j                    Just send commands then exit immediatly
+  -s, --server=IP:PORT  Start midsim server listening on IP:PORT
+  -r, --remote=IP:PORT  Query remote midsim server on IP:PORT
+
+  address,port required except for --type=ping
+  Max number of addresses is 32.
+```
+
+
+## Calibration
+The main goal of the pressure modules was to report differencial pressure. The pressure module can be calibrated and there is a script to help with that process. It takes a large amounts of samples and sets an offset to match the reference. This script can be found at `sensor_hubv3/code/test/calibrator.py`
+
