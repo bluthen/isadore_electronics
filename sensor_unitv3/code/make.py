@@ -35,6 +35,7 @@ def usage():
 	print >> sys.stderr, "  --with-pressurev4b=cal_adjust   Build in v4b pressure module"
 	print >> sys.stderr, "  --with-pressurev5=m,b           Build in v5 pressure module"
 	print >> sys.stderr, "  --with-anemometer               Build in Anemometer module"
+	print >> sys.stderr, "  --with-anemometerv2             Build in Anemometer module"
 	print >> sys.stderr, "  --with-thermo                   Build in thermocouple module"
 	print >> sys.stderr, "  --with-multit                   Build in Multipoint-temp module"
 	print >> sys.stderr, "  --with-tach                     Build in tachometer module"
@@ -45,7 +46,7 @@ def setFuse():
 
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "hdpcf", ["help", "debug", "program", "clean", "fuse", "with-th", "with-pressure=", "with-pressurev1=", "with-pressurev4a=", "with-pressurev4b=", "with-pressurev5=", "with-anemometer", "with-thermo", "with-multit", "with-tach", "prev303"])
+	opts, args = getopt.getopt(sys.argv[1:], "hdpcf", ["help", "debug", "program", "clean", "fuse", "with-th", "with-pressure=", "with-pressurev1=", "with-pressurev4a=", "with-pressurev4b=", "with-pressurev5=", "with-anemometer", "with-anemometerv2", "with-thermo", "with-multit", "with-tach", "prev303"])
 	print opts
 	print args
 except getopt.GetoptError, err:
@@ -129,6 +130,10 @@ if "--with-pressurev5" in options:
 if "--with-anemometer" in options:
 	UNITSRC.append("./modules/anemometer/anemometer.c")
 	UNITDEFS.append("-DMODULE_ANEMOMETER")
+
+if "--with-anemometerv2" in options:
+	UNITSRC.append("./modules/anemometerv2/anemometer.c")
+	UNITDEFS.append("-DMODULE_ANEMOMETERV2")
 
 if "--with-thermo" in options:
 	UNITSRC.append("./modules/thermocouplev2/thermocouple.c")

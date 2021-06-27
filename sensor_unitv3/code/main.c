@@ -40,6 +40,10 @@
 #include "anemometer/anemometer.h"
 #endif
 
+#if defined(MODULE_ANEMOMETERV2)
+#include "anemometerv2/anemometer.h"
+#endif
+
 #if defined(MODULE_PRESSUREV1)
 #include "pressurev1/pressurev1.h"
 #endif
@@ -193,7 +197,7 @@ int main(void)
 				mymemcpy(&txbuffer[MAGIC_SIZE+6], &h, 2);
 			} 
 #endif
-#ifdef MODULE_ANEMOMETER
+#if defined(MODULE_ANEMOMETER) || defined(MODULE_ANEMOMETERV2)
 			else if (cc == CC_ANEMOMETER)
 			{
 				s=2;
@@ -551,7 +555,7 @@ void ioinit(void)
 	//ADC clock needs to be between 50kHz-200kHz
 	ADCSRA=0xC5; // ADC 128 clock prescaller
 #endif
-#ifdef MODULE_ANEMOMETER
+#if defined(MODULE_ANEMOMETER) || defined(MODULE_ANEMOMETERV2)
 	anemometer_ioinit();
 #endif
 #ifdef MODULE_TACHOMETER
